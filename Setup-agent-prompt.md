@@ -1,4 +1,4 @@
-# AGENTS.md — 一键安装提示词（复制粘贴给任意 Agent 即可）
+# Setup-agent-prompt.md — 一键安装提示词（复制粘贴给任意 Agent 即可）
 
 > 用法：把本文件全文复制给一个 AI Agent（Claude Code / OpenClaw / DSH /
 > Codex / Cursor 等），它就会自动完成 gateway-image-gen 的安装、验证，并

@@ -45,7 +45,7 @@ CLIProxyAPI 是一个本地中转，把 Codex CLI（及其他 CLI）通过 OpenA
 
 ### 最快：让 Agent 来做
 
-把 **[AGENTS.md](./AGENTS.md)** 全文复制，丢给任意 AI Agent（Claude Code /
+把 **[Setup-agent-prompt.md](./Setup-agent-prompt.md)** 全文复制，丢给任意 AI Agent（Claude Code /
 OpenClaw / DSH / Codex / Cursor）。Agent 会自动完成：安装 skill → 验证
 CLIProxyAPI → 跑一张测试图 → 按使用规则开始生图。全程无需手工操作。
 
@@ -100,15 +100,15 @@ python3 scripts/gateway_image_gen.py --list-models
 
 | 文件 | 读者 | 作用 |
 |---|---|---|
-| [AGENTS.md](./AGENTS.md) | 任意 AI Agent | **一键安装提示词**：复制丢给 agent，它自动安装 + 验证 + 开始使用 |
+| [Setup-agent-prompt.md](./Setup-agent-prompt.md) | 任意 AI Agent | **一键安装提示词**：复制丢给 agent，它自动安装 + 验证 + 开始使用 |
 | [SKILL.md](./SKILL.md) | agent 运行时 | 安装后的 skill 本体：触发条件、参数、使用规则 |
 | [README.md](./README.md) / [README.zh.md](./README.zh.md) | 人 | 概览、CLIProxyAPI 安装/配置手册、CLI 参考 |
 | [scripts/gateway_image_gen.py](./scripts/gateway_image_gen.py) | agent / CLI | 真正调用端点的零依赖客户端 |
 
-`AGENTS.md` 和 `SKILL.md` **并不重复**——它们服务的时机不同：`AGENTS.md`
+`Setup-agent-prompt.md` 和 `SKILL.md` **并不重复**——它们服务的时机不同：`Setup-agent-prompt.md`
 是把 skill「安装进 agent」的引导提示词；`SKILL.md` 是安装之后 agent 使用的
 本体（也是这个文件夹成为标准 agent skill 的关键）。`README.md` 是给人看的
-手册，`AGENTS.md` 只是把这个手册里的安装步骤变成了一段可复制的 agent 提示词。
+手册，`Setup-agent-prompt.md` 只是把这个手册里的安装步骤变成了一段可复制的 agent 提示词。
 
 ## License
 

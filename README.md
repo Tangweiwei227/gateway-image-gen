@@ -79,7 +79,7 @@ work as any OpenAI-compatible images API.
 
 ### Quickest: let an agent do it
 
-Copy the full contents of **[AGENTS.md](./AGENTS.md)** and paste them into any
+Copy the full contents of **[Setup-agent-prompt.md](./Setup-agent-prompt.md)** and paste them into any
 AI agent (Claude Code / OpenClaw / DSH / Codex / Cursor). The agent will
 install the skill, verify CLIProxyAPI, run a test image, and start following
 the usage rules on its own. No manual steps required.
@@ -135,15 +135,15 @@ with `--model`.
 
 | File | Audience | Role |
 |---|---|---|
-| [AGENTS.md](./AGENTS.md) | any AI agent | **One-click install prompt**: paste it into an agent and it installs + verifies + starts using the skill |
+| [Setup-agent-prompt.md](./Setup-agent-prompt.md) | any AI agent | **One-click install prompt**: paste it into an agent and it installs + verifies + starts using the skill |
 | [SKILL.md](./SKILL.md) | the agent at runtime | The installed skill body: when to trigger, params, usage rules (loaded after install) |
 | [README.md](./README.md) / [README.zh.md](./README.zh.md) | humans | Overview, CLIProxyAPI install/config manual, CLI reference |
 | [scripts/gateway_image_gen.py](./scripts/gateway_image_gen.py) | the agent / CLI | Zero-dependency client that actually calls the endpoint |
 
-`AGENTS.md` and `SKILL.md` are **not redundant** — they serve different moments:
-`AGENTS.md` is the bootstrap prompt that *installs* the skill into an agent;
+`Setup-agent-prompt.md` and `SKILL.md` are **not redundant** — they serve different moments:
+`Setup-agent-prompt.md` is the bootstrap prompt that *installs* the skill into an agent;
 `SKILL.md` is what the agent uses *after* it is installed (and it is what makes
-the folder a proper agent skill). `README.md` is the human manual; `AGENTS.md`
+the folder a proper agent skill). `README.md` is the human manual; `Setup-agent-prompt.md`
 simply turns that manual's install steps into a paste-able agent prompt.
 
 ## Security
