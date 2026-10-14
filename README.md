@@ -1,24 +1,29 @@
 # gateway-image-gen
 
-> Generate and edit images through any OpenAI-compatible images API — a
-> self-hosted gateway, a relay, or an official `gpt-image-2.5` endpoint. Ships
-> as a reusable agent skill plus a zero-dependency Python CLI.
+> Generate and edit images by consuming the OpenAI-compatible images endpoint
+> proxied by **CLIproxyAPI** — which exposes Codex CLI's image-generation
+> capability as a standard `/v1/images/generations` API. Ships as a reusable
+> agent skill plus a zero-dependency Python CLI.
 
-`gateway-image-gen` is a small, dependency-free image generation skill:
+`gateway-image-gen` is the client for the local [CLIproxyAPI](https://github.com/router-for-me/CLIProxyAPI)
+proxy:
 
+- **Codex image capability, proxied** — CLIproxyAPI injects an
+  `image_generation` tool for Codex CLI and routes image models through the
+  standard OpenAI-compatible `/v1/images/generations` endpoint, default listen
+  address `http://127.0.0.1:8317/v1`.
 - **Text-to-image** — `gpt-image-2.5` (and friends: `gpt-image-2.5-flare`,
   `gpt-image-2.5-sunburst`, `gpt-image-2`, `gemini-3.1-flash-image`, ...) via
-  the standard OpenAI-compatible `/v1/images/generations` endpoint.
+  that endpoint.
 - **Image editing** — restyle / modify a reference image through
   `/v1/images/edits` (multipart upload).
 - **Zero dependencies** — the CLI uses only Python 3 stdlib (`urllib`).
-- **Bring your own gateway** — point it at any OpenAI-compatible images API via
-  `--base-url` / `GATEWAY_BASE_URL` and `--api-key` / `GATEWAY_API_KEY`. No paid
-  per-image subscription required if you self-host.
+- **Any OpenAI-compatible endpoint works** — point it elsewhere with
+  `--base-url` / `GATEWAY_BASE_URL` and `--api-key` / `GATEWAY_API_KEY`.
 
 ## Features
 
-- Verified against a `gpt-image-2.5` gateway: text-to-image and image-edit both
+- Verified against a gpt-image-2.5 endpoint: text-to-image and image-edit both
   return HTTP 200 and produce PNGs.
 - Parametrized: `--model`, `--size` (1024² / 1536×1024 / 1024×1536 / 2048²),
   `--quality` (low → max), `--background` (opaque / transparent PNG cutout),
@@ -29,11 +34,13 @@
 ## Requirements
 
 - Python 3 (stdlib only).
-- A reachable OpenAI-compatible images endpoint. The default base URL is
-  `http://127.0.0.1:8317/v1` (a local relay); override with
-  `GATEWAY_BASE_URL` or `--base-url`.
-- An API key via `GATEWAY_API_KEY` env var or `--api-key` (unless your endpoint
-  requires none).
+- [CLIproxyAPI](https://github.com/router-for-me/CLIProxyAPI) running, or any
+  other OpenAI-compatible images endpoint. Default base URL:
+  `http://127.0.0.1:8317/v1` (CLIproxyAPI's default listen address); override
+  with `GATEWAY_BASE_URL` or `--base-url`.
+- An API key via `GATEWAY_API_KEY` env var or `--api-key` (CLIproxyAPI accepts
+  keys through its `generative-language-api-key` parameter; omit if your
+  endpoint requires none).
 
 ## Install as an agent skill
 
@@ -51,7 +58,7 @@ The skill's `SKILL.md` teaches the agent when to use it and how; the agent runs
 ## CLI usage
 
 ```sh
-# Text-to-image
+# Text-to-image (defaults to CLIproxyAPI at http://127.0.0.1:8317/v1)
 python3 scripts/gateway_image_gen.py "a golden retriever running in a meadow at dusk, photorealistic" \
   --output-dir ./output
 
@@ -76,7 +83,7 @@ The script resolves the key → calls the endpoint → saves timestamped PNGs in
 
 ## Model notes
 
-Verified on a gpt-image-2.5 gateway: `gpt-image-2.5` (default),
+Verified on a gpt-image-2.5 endpoint: `gpt-image-2.5` (default),
 `gpt-image-2.5-flare`, `gpt-image-2.5-sunburst`, `gpt-image-2`,
 `gpt-image-1.5`, `gemini-3.1-flash-image`. Run `--list-models` for the
 authoritative list on your endpoint; an id outside the list can still be tried
