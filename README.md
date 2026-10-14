@@ -1,14 +1,14 @@
 # gateway-image-gen
 
 > Generate and edit images by consuming the OpenAI-compatible images endpoint
-> proxied by **CLIproxyAPI** — which exposes Codex CLI's image-generation
+> proxied by **CLIProxyAPI** — which exposes Codex CLI's image-generation
 > capability as a standard `/v1/images/generations` API. Ships as a reusable
 > agent skill plus a zero-dependency Python CLI.
 
-`gateway-image-gen` is the client for the local [CLIproxyAPI](https://github.com/router-for-me/CLIProxyAPI)
+`gateway-image-gen` is the client for the local [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)
 proxy:
 
-- **Codex image capability, proxied** — CLIproxyAPI injects an
+- **Codex image capability, proxied** — CLIProxyAPI injects an
   `image_generation` tool for Codex CLI and routes image models through the
   standard OpenAI-compatible `/v1/images/generations` endpoint, default listen
   address `http://127.0.0.1:8317/v1`.
@@ -34,13 +34,44 @@ proxy:
 ## Requirements
 
 - Python 3 (stdlib only).
-- [CLIproxyAPI](https://github.com/router-for-me/CLIProxyAPI) running, or any
+- [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) running, or any
   other OpenAI-compatible images endpoint. Default base URL:
-  `http://127.0.0.1:8317/v1` (CLIproxyAPI's default listen address); override
+  `http://127.0.0.1:8317/v1` (CLIProxyAPI's default listen address); override
   with `GATEWAY_BASE_URL` or `--base-url`.
-- An API key via `GATEWAY_API_KEY` env var or `--api-key` (CLIproxyAPI accepts
+- An API key via `GATEWAY_API_KEY` env var or `--api-key` (CLIProxyAPI accepts
   keys through its `generative-language-api-key` parameter; omit if your
   endpoint requires none).
+
+## Install & configure CLIProxyAPI
+
+CLIProxyAPI is a local relay that proxies Codex CLI (and other CLIs) through an
+OpenAI/Anthropic-compatible API. The image models appear once Codex's
+`image_generation` tool is injected ([PR #2962](https://github.com/router-for-me/CLIProxyAPI/pull/2962));
+then `GET /v1/models` lists them and `/v1/images/generations` + `/v1/images/edits`
+work as any OpenAI-compatible images API.
+
+1. **Install CLIProxyAPI** — follow the official quick start for your OS
+   ([EN](https://help.router-for.me/introduction/quick-start) /
+   [中文](https://help.router-for.me/cn/introduction/quick-start)); macOS notes
+   are tracked in [issue #2064](https://github.com/router-for-me/CLIProxyAPI/issues/2064).
+   Releases are published on the [GitHub repo](https://github.com/router-for-me/CLIProxyAPI/releases),
+   and a Homebrew formula is maintained by [mxcl/pkg.so](https://github.com/mxcl/pkg.so/blob/main/combined/cliproxyapi.yml).
+2. **Configure** — copy `config.example.yaml` from the repo root to
+   `config.yaml` and edit (v8 layout): set your upstream credentials for Codex,
+   the listen address (default `127.0.0.1:8317`), and, if you want the proxy to
+   require a key, list accepted keys under `generative-language-api-key`.
+3. **Run it** — start the proxy; verify the images endpoint:
+   `curl http://127.0.0.1:8317/v1/models`.
+4. **Point Codex at it** (if not already) — set
+   `base_url = "http://127.0.0.1:8317/v1"` in your Codex config so the proxied
+   `image_generation` tool routes through CLIProxyAPI.
+5. **Point this skill at it** — that's the default; no extra setup needed.
+   Optionally `export GATEWAY_API_KEY=...` if your config requires one.
+
+> **macOS tip** — see the macOS quick-start thread
+> ([issue #2064](https://github.com/router-for-me/CLIProxyAPI/issues/2064)) for
+> version-specific install/run notes. Exact commands differ by release; when in
+> doubt, prefer the official quick start above.
 
 ## Install as an agent skill
 
@@ -55,10 +86,15 @@ cp -R gateway-image-gen ~/.agents/skills/
 The skill's `SKILL.md` teaches the agent when to use it and how; the agent runs
 `scripts/gateway_image_gen.py` for you. Or use the CLI directly:
 
+> **For agent setups:** a ready-to-paste agent prompt lives in
+> [AGENTS.md](./AGENTS.md) — drop it into your agent's instructions (Claude
+> Code / OpenClaw / DSH / Codex) or keep it in the repo where `AGENTS.md`
+> readers pick it up automatically.
+
 ## CLI usage
 
 ```sh
-# Text-to-image (defaults to CLIproxyAPI at http://127.0.0.1:8317/v1)
+# Text-to-image (defaults to CLIProxyAPI at http://127.0.0.1:8317/v1)
 python3 scripts/gateway_image_gen.py "a golden retriever running in a meadow at dusk, photorealistic" \
   --output-dir ./output
 

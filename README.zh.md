@@ -1,10 +1,10 @@
 # gateway-image-gen
 
-> 通过消费 **CLIproxyAPI** 代理出的 OpenAI 兼容 images 端点生成/编辑图片——CLIproxyAPI 把 Codex CLI 的图像生成能力暴露为标准 `/v1/images/generations` API。以「可复用 agent skill + 零依赖 Python CLI」的形式发布。
+> 通过消费 **CLIProxyAPI** 代理出的 OpenAI 兼容 images 端点生成/编辑图片——CLIProxyAPI 把 Codex CLI 的图像生成能力暴露为标准 `/v1/images/generations` API。以「可复用 agent skill + 零依赖 Python CLI」的形式发布。
 
-`gateway-image-gen` 是本机 [CLIproxyAPI](https://github.com/router-for-me/CLIProxyAPI) 代理的配套客户端：
+`gateway-image-gen` 是本机 [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) 代理的配套客户端：
 
-- **Codex 图像能力，代理出来** —— CLIproxyAPI 为 Codex CLI 注入 `image_generation` 工具，把图像模型路由到标准 OpenAI 兼容的 `/v1/images/generations` 端点，默认监听 `http://127.0.0.1:8317/v1`。
+- **Codex 图像能力，代理出来** —— CLIProxyAPI 为 Codex CLI 注入 `image_generation` 工具，把图像模型路由到标准 OpenAI 兼容的 `/v1/images/generations` 端点，默认监听 `http://127.0.0.1:8317/v1`。
 - **文生图** —— 通过该端点调用 `gpt-image-2.5`（以及 `gpt-image-2.5-flare`、`gpt-image-2.5-sunburst`、`gpt-image-2`、`gemini-3.1-flash-image` 等）。
 - **图生图 / 编辑** —— 通过 `/v1/images/edits`（multipart 上传参考图）做改图、重绘。
 - **零依赖** —— CLI 只依赖 Python 3 标准库（`urllib`）。
@@ -20,12 +20,24 @@
 ## 前置要求
 
 - Python 3（仅标准库）。
-- 正在运行的 [CLIproxyAPI](https://github.com/router-for-me/CLIProxyAPI)，或任意其他 OpenAI 兼容 images 端点。默认 base URL 为 `http://127.0.0.1:8317/v1`（CLIproxyAPI 默认监听地址），可用 `GATEWAY_BASE_URL` 或 `--base-url` 覆盖。
-- API Key：环境变量 `GATEWAY_API_KEY` 或 `--api-key`（CLIproxyAPI 通过 `generative-language-api-key` 参数接受 Key；端点不要求时可不填）。
+- 正在运行的 [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)，或任意其他 OpenAI 兼容 images 端点。默认 base URL 为 `http://127.0.0.1:8317/v1`（CLIProxyAPI 默认监听地址），可用 `GATEWAY_BASE_URL` 或 `--base-url` 覆盖。
+- API Key：环境变量 `GATEWAY_API_KEY` 或 `--api-key`（CLIProxyAPI 通过 `generative-language-api-key` 参数接受 Key；端点不要求时可不填）。
 
-## 与 CLIproxyAPI 的关系
+## 与 CLIProxyAPI 的关系
 
-[CLIproxyAPI](https://github.com/router-for-me/CLIProxyAPI) 以本地中转形式运行，可为 Codex CLI 注入 `image_generation` 工具，把图像模型通过标准 OpenAI 兼容路由 `/v1/images/generations` 暴露出来（默认监听 `http://127.0.0.1:8317/v1`）。本 skill 就是这个端点的客户端：agent 执行 `scripts/gateway_image_gen.py`，与任何 OpenAI 兼容 images 客户端一样和代理对话。
+[CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) 以本地中转形式运行，可为 Codex CLI 注入 `image_generation` 工具，把图像模型通过标准 OpenAI 兼容路由 `/v1/images/generations` 暴露出来（默认监听 `http://127.0.0.1:8317/v1`）。本 skill 就是这个端点的客户端：agent 执行 `scripts/gateway_image_gen.py`，与任何 OpenAI 兼容 images 客户端一样和代理对话。
+
+## 安装与配置 CLIProxyAPI
+
+CLIProxyAPI 是一个本地中转，把 Codex CLI（及其他 CLI）通过 OpenAI/Anthropic 兼容 API 代理出来。Codex 的 `image_generation` 工具注入后（[PR #2962](https://github.com/router-for-me/CLIProxyAPI/pull/2962)），图像模型就会出现：`GET /v1/models` 能列出它们，`/v1/images/generations` 与 `/v1/images/edits` 按标准 OpenAI 兼容 images API 工作。
+
+1. **安装 CLIProxyAPI** —— 按官方快速开始安装你的系统版本（[英文](https://help.router-for.me/introduction/quick-start) / [中文](https://help.router-for.me/cn/introduction/quick-start)）；macOS 注意事项见 [issue #2064](https://github.com/router-for-me/CLIProxyAPI/issues/2064)。发布版在 [GitHub releases](https://github.com/router-for-me/CLIProxyAPI/releases)，Homebrew 公式由 [mxcl/pkg.so](https://github.com/mxcl/pkg.so/blob/main/combined/cliproxyapi.yml) 维护。
+2. **配置** —— 把仓库根目录的 `config.example.yaml` 复制为 `config.yaml` 并编辑（v8 布局）：填 Codex 的上游凭证、监听地址（默认 `127.0.0.1:8317`）；如果希望代理要求 Key，在 `generative-language-api-key` 下列出可接受的 Key。
+3. **启动** —— 运行代理，验证 images 端点：`curl http://127.0.0.1:8317/v1/models`。
+4. **让 Codex 指向它**（如尚未配置）—— 在 Codex 配置里设 `base_url = "http://127.0.0.1:8317/v1"`，被代理的 `image_generation` 工具就会走 CLIProxyAPI。
+5. **让本 skill 指向它** —— 这就是默认值，无需额外配置；若你的配置要求 Key，可 `export GATEWAY_API_KEY=...`。
+
+> **macOS 提示** —— 版本相关安装/运行细节见 macOS 快速开始讨论串（[issue #2064](https://github.com/router-for-me/CLIProxyAPI/issues/2064)）。具体命令随版本而异，拿不准时以官方快速开始为准。
 
 ## 作为 agent skill 安装
 
@@ -40,10 +52,14 @@ cp -R gateway-image-gen ~/.agents/skills/
 skill 里的 `SKILL.md` 会教 agent 何时使用、怎么用，agent 会替你执行
 `scripts/gateway_image_gen.py`。也可以直接当 CLI 用：
 
+> **给 agent 用**：现成的 agent Prompt 在 [AGENTS.md](./AGENTS.md)——拷进你的
+> agent 指令（Claude Code / OpenClaw / DSH / Codex）即可，或留在仓库里，
+> 支持读 `AGENTS.md` 的 agent 会自动加载。
+
 ## CLI 用法
 
 ```sh
-# 文生图（默认指向 CLIproxyAPI 的 http://127.0.0.1:8317/v1）
+# 文生图（默认指向 CLIProxyAPI 的 http://127.0.0.1:8317/v1）
 python3 scripts/gateway_image_gen.py "黄昏草地奔跑的金毛犬，写实风" \
   --output-dir ./output
 

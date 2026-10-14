@@ -1,13 +1,13 @@
 ---
 name: gateway-image-gen
-description: Generate or edit images by consuming the OpenAI-compatible images endpoint exposed by CLIproxyAPI (which proxies Codex CLI's image_generation tool to /v1/images/generations, default http://127.0.0.1:8317/v1). Use when the user wants an AI image / illustration / poster / icon / avatar / image edit through the local CLIproxyAPI proxy. Saves results locally and reports the path.
+description: Generate or edit images by consuming the OpenAI-compatible images endpoint exposed by CLIProxyAPI (which proxies Codex CLI's image_generation tool to /v1/images/generations, default http://127.0.0.1:8317/v1). Use when the user wants an AI image / illustration / poster / icon / avatar / image edit through the local CLIProxyAPI proxy. Saves results locally and reports the path.
 user-invocable: true
 ---
 
 # Gateway Image Gen (gateway-image-gen)
 
 Generate and edit images by consuming the OpenAI-compatible images endpoint
-exposed by **CLIproxyAPI** ([router-for-me/CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)),
+exposed by **CLIProxyAPI** ([router-for-me/CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)),
 which proxies Codex CLI's image-generation capability to a local
 `/v1/images/generations` endpoint. Text-to-image and image-editing (reference
 image) are both supported. The bundled script uses only the Python 3 stdlib.
@@ -15,23 +15,23 @@ image) are both supported. The bundled script uses only the Python 3 stdlib.
 ## When to use
 
 - The user wants an AI-generated image: illustration, poster, icon, avatar,
-  cover, concept art, product shot, etc., through the local CLIproxyAPI proxy.
-- The user mentions CLIproxyAPI / CLI Proxy API / local proxy / 本地中转, or
+  cover, concept art, product shot, etc., through the local CLIProxyAPI proxy.
+- The user mentions CLIProxyAPI / CLI Proxy API / local proxy / 本地中转, or
   names an image model exposed by it (gpt-image-2.5, gpt-image-2.5-flare,
   gpt-image-2, gemini-3.1-flash-image, ...).
 - The user provides a reference image and wants to edit / restyle / combine it.
-- The user wants to reuse Codex's image capability (proxied by CLIproxyAPI)
+- The user wants to reuse Codex's image capability (proxied by CLIProxyAPI)
   instead of paying per-image elsewhere.
 
 **Do not use for:** ChatCut Desktop project images (use the ChatCut image tool),
 Volcengine Ark Seedream (use `arkcli-gen`), Aliyun Bailian / Qwen / DashScope
 (use `qwen-image-gen`), or MiniMax (use the MiniMax skill). This skill is for
-the OpenAI-compatible images endpoint proxied by CLIproxyAPI (or any drop-in
+the OpenAI-compatible images endpoint proxied by CLIProxyAPI (or any drop-in
 OpenAI-compatible images endpoint).
 
-## How it fits with CLIproxyAPI
+## How it fits with CLIProxyAPI
 
-[CLIproxyAPI](https://github.com/router-for-me/CLIProxyAPI) runs as a local
+[CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) runs as a local
 relay and can inject an `image_generation` tool for Codex CLI, exposing the
 image models through the standard OpenAI-compatible route
 `/v1/images/generations` (default listen address
@@ -41,16 +41,16 @@ way any OpenAI-compatible images client would.
 
 ## Prerequisites
 
-- CLIproxyAPI is running (default base URL
+- CLIProxyAPI is running (default base URL
   `http://127.0.0.1:8317/v1`, override with `GATEWAY_BASE_URL` or `--base-url`).
-- API key: set env `GATEWAY_API_KEY`, or pass `--api-key` (CLIproxyAPI can be
+- API key: set env `GATEWAY_API_KEY`, or pass `--api-key` (CLIProxyAPI can be
   configured to accept one via its generative-language-api-key parameter).
   Never hardcode keys in the script or documentation.
 
 ## Models
 
 Run `--list-models` against your endpoint for the authoritative list. Verified
-through CLIproxyAPI on gpt-image-2.5:
+through CLIProxyAPI on gpt-image-2.5:
 
 | Model | Notes |
 |---|---|
@@ -118,7 +118,7 @@ names into `--output-dir` (default `./output`) → prints the local paths.
   the user asks, with a warning.
 - Use `background: transparent` only when a cutout/overlay is needed (PNG).
 - On connection failure / HTTP 503: check `GET <base-url>/models` and tell the
-  user to confirm CLIproxyAPI is running — do not silently switch to another
+  user to confirm CLIProxyAPI is running — do not silently switch to another
   image skill.
 - Report results as "saved to <path>" in the user's working directory.
 
@@ -126,7 +126,7 @@ names into `--output-dir` (default `./output`) → prints the local paths.
 
 - Exit code 0 + printed local path → success.
 - HTTP 4xx: check model id / params (e.g. unsupported size).
-- HTTP 5xx / connection error: CLIproxyAPI down or upstream failure.
+- HTTP 5xx / connection error: CLIProxyAPI down or upstream failure.
 
 ## License
 
