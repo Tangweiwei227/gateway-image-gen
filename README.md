@@ -1,5 +1,7 @@
 # gateway-image-gen
 
+[简体中文](./README.zh.md) | English
+
 > Generate and edit images by consuming the OpenAI-compatible images endpoint
 > proxied by **CLIProxyAPI** — which exposes Codex CLI's image-generation
 > capability as a standard `/v1/images/generations` API. Ships as a reusable

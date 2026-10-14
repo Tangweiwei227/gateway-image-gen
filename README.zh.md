@@ -1,5 +1,7 @@
 # gateway-image-gen
 
+简体中文 | [English](./README.md)
+
 > 通过消费 **CLIProxyAPI** 代理出的 OpenAI 兼容 images 端点生成/编辑图片——CLIProxyAPI 把 Codex CLI 的图像生成能力暴露为标准 `/v1/images/generations` API。以「可复用 agent skill + 零依赖 Python CLI」的形式发布。
 
 `gateway-image-gen` 是本机 [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) 代理的配套客户端：
