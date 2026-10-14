@@ -60,8 +60,10 @@ work as any OpenAI-compatible images API.
    `config.yaml` and edit (v8 layout): set your upstream credentials for Codex,
    the listen address (default `127.0.0.1:8317`), and, if you want the proxy to
    require a key, list accepted keys under `generative-language-api-key`.
-3. **Run it** — start the proxy; verify the images endpoint:
-   `curl http://127.0.0.1:8317/v1/models`.
+3. **Run it** — start the proxy; verify the images endpoint (with your key —
+   a bare `curl` returns 401 auth failure, which just means "key required",
+   not "not running"):
+   `curl -s -H "Authorization: Bearer $GATEWAY_API_KEY" http://127.0.0.1:8317/v1/models`.
 4. **Point Codex at it** (if not already) — set
    `base_url = "http://127.0.0.1:8317/v1"` in your Codex config so the proxied
    `image_generation` tool routes through CLIProxyAPI.
@@ -73,7 +75,16 @@ work as any OpenAI-compatible images API.
 > version-specific install/run notes. Exact commands differ by release; when in
 > doubt, prefer the official quick start above.
 
-## Install as an agent skill
+## Install
+
+### Quickest: let an agent do it
+
+Copy the full contents of **[AGENTS.md](./AGENTS.md)** and paste them into any
+AI agent (Claude Code / OpenClaw / DSH / Codex / Cursor). The agent will
+install the skill, verify CLIProxyAPI, run a test image, and start following
+the usage rules on its own. No manual steps required.
+
+### Manual: install as an agent skill
 
 Drop the folder into your agent's skills directory, e.g.:
 
@@ -85,11 +96,6 @@ cp -R gateway-image-gen ~/.agents/skills/
 
 The skill's `SKILL.md` teaches the agent when to use it and how; the agent runs
 `scripts/gateway_image_gen.py` for you. Or use the CLI directly:
-
-> **For agent setups:** a ready-to-paste agent prompt lives in
-> [AGENTS.md](./AGENTS.md) — drop it into your agent's instructions (Claude
-> Code / OpenClaw / DSH / Codex) or keep it in the repo where `AGENTS.md`
-> readers pick it up automatically.
 
 ## CLI usage
 
@@ -124,6 +130,21 @@ Verified on a gpt-image-2.5 endpoint: `gpt-image-2.5` (default),
 `gpt-image-1.5`, `gemini-3.1-flash-image`. Run `--list-models` for the
 authoritative list on your endpoint; an id outside the list can still be tried
 with `--model`.
+
+## Repo layout — who reads what
+
+| File | Audience | Role |
+|---|---|---|
+| [AGENTS.md](./AGENTS.md) | any AI agent | **One-click install prompt**: paste it into an agent and it installs + verifies + starts using the skill |
+| [SKILL.md](./SKILL.md) | the agent at runtime | The installed skill body: when to trigger, params, usage rules (loaded after install) |
+| [README.md](./README.md) / [README.zh.md](./README.zh.md) | humans | Overview, CLIProxyAPI install/config manual, CLI reference |
+| [scripts/gateway_image_gen.py](./scripts/gateway_image_gen.py) | the agent / CLI | Zero-dependency client that actually calls the endpoint |
+
+`AGENTS.md` and `SKILL.md` are **not redundant** — they serve different moments:
+`AGENTS.md` is the bootstrap prompt that *installs* the skill into an agent;
+`SKILL.md` is what the agent uses *after* it is installed (and it is what makes
+the folder a proper agent skill). `README.md` is the human manual; `AGENTS.md`
+simply turns that manual's install steps into a paste-able agent prompt.
 
 ## Security
 

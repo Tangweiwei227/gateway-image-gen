@@ -33,13 +33,23 @@ CLIProxyAPI 是一个本地中转，把 Codex CLI（及其他 CLI）通过 OpenA
 
 1. **安装 CLIProxyAPI** —— 按官方快速开始安装你的系统版本（[英文](https://help.router-for.me/introduction/quick-start) / [中文](https://help.router-for.me/cn/introduction/quick-start)）；macOS 注意事项见 [issue #2064](https://github.com/router-for-me/CLIProxyAPI/issues/2064)。发布版在 [GitHub releases](https://github.com/router-for-me/CLIProxyAPI/releases)，Homebrew 公式由 [mxcl/pkg.so](https://github.com/mxcl/pkg.so/blob/main/combined/cliproxyapi.yml) 维护。
 2. **配置** —— 把仓库根目录的 `config.example.yaml` 复制为 `config.yaml` 并编辑（v8 布局）：填 Codex 的上游凭证、监听地址（默认 `127.0.0.1:8317`）；如果希望代理要求 Key，在 `generative-language-api-key` 下列出可接受的 Key。
-3. **启动** —— 运行代理，验证 images 端点：`curl http://127.0.0.1:8317/v1/models`。
+3. **启动** —— 运行代理，验证 images 端点（要带 Key；裸 `curl` 会返回 401
+   鉴权失败，那只是「需要 Key」，不代表没在跑）：
+   `curl -s -H "Authorization: Bearer $GATEWAY_API_KEY" http://127.0.0.1:8317/v1/models`。
 4. **让 Codex 指向它**（如尚未配置）—— 在 Codex 配置里设 `base_url = "http://127.0.0.1:8317/v1"`，被代理的 `image_generation` 工具就会走 CLIProxyAPI。
 5. **让本 skill 指向它** —— 这就是默认值，无需额外配置；若你的配置要求 Key，可 `export GATEWAY_API_KEY=...`。
 
 > **macOS 提示** —— 版本相关安装/运行细节见 macOS 快速开始讨论串（[issue #2064](https://github.com/router-for-me/CLIProxyAPI/issues/2064)）。具体命令随版本而异，拿不准时以官方快速开始为准。
 
-## 作为 agent skill 安装
+## 安装
+
+### 最快：让 Agent 来做
+
+把 **[AGENTS.md](./AGENTS.md)** 全文复制，丢给任意 AI Agent（Claude Code /
+OpenClaw / DSH / Codex / Cursor）。Agent 会自动完成：安装 skill → 验证
+CLIProxyAPI → 跑一张测试图 → 按使用规则开始生图。全程无需手工操作。
+
+### 手动：作为 agent skill 安装
 
 把整个文件夹放进 agent 的 skills 目录，例如：
 
@@ -51,10 +61,6 @@ cp -R gateway-image-gen ~/.agents/skills/
 
 skill 里的 `SKILL.md` 会教 agent 何时使用、怎么用，agent 会替你执行
 `scripts/gateway_image_gen.py`。也可以直接当 CLI 用：
-
-> **给 agent 用**：现成的 agent Prompt 在 [AGENTS.md](./AGENTS.md)——拷进你的
-> agent 指令（Claude Code / OpenClaw / DSH / Codex）即可，或留在仓库里，
-> 支持读 `AGENTS.md` 的 agent 会自动加载。
 
 ## CLI 用法
 
@@ -89,6 +95,20 @@ python3 scripts/gateway_image_gen.py --list-models
 
 - 不要把 API Key 写死在脚本/代码里或提交进仓库。使用 `GATEWAY_API_KEY` 或 `--api-key`。
 - 生成产物保存在本地；脚本只向你自己配置的端点发送数据。
+
+## 仓库布局 —— 谁读哪个文件
+
+| 文件 | 读者 | 作用 |
+|---|---|---|
+| [AGENTS.md](./AGENTS.md) | 任意 AI Agent | **一键安装提示词**：复制丢给 agent，它自动安装 + 验证 + 开始使用 |
+| [SKILL.md](./SKILL.md) | agent 运行时 | 安装后的 skill 本体：触发条件、参数、使用规则 |
+| [README.md](./README.md) / [README.zh.md](./README.zh.md) | 人 | 概览、CLIProxyAPI 安装/配置手册、CLI 参考 |
+| [scripts/gateway_image_gen.py](./scripts/gateway_image_gen.py) | agent / CLI | 真正调用端点的零依赖客户端 |
+
+`AGENTS.md` 和 `SKILL.md` **并不重复**——它们服务的时机不同：`AGENTS.md`
+是把 skill「安装进 agent」的引导提示词；`SKILL.md` 是安装之后 agent 使用的
+本体（也是这个文件夹成为标准 agent skill 的关键）。`README.md` 是给人看的
+手册，`AGENTS.md` 只是把这个手册里的安装步骤变成了一段可复制的 agent 提示词。
 
 ## License
 
